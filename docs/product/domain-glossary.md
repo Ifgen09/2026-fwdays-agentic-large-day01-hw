@@ -2,13 +2,15 @@
 
 Словник доменних термінів, які мають **специфічне значення** в кодовій базі Excalidraw. Для кожного терміну вказано визначення в контексті проєкту, ключові файли та типові помилки інтерпретації.
 
+**Мова:** визначення та пояснення — **українською**; імена типів, файлів і символів у коді — **англійською**, як у репозиторії; назви полів і літерали в зворотних лапках `` `...` `` можуть лишатися англійською.
+
 ---
 
 ## Element (`ExcalidrawElement`)
 
 **Визначення.** Базова одиниця контенту на canvas — будь-який намальований об'єкт: прямокутник, стрілка, текст, зображення тощо. У коді представлений як tagged union `ExcalidrawElement` з дискримінатором `type`.
 
-**Ключові властивості (з `_ExcalidrawElementBase`):** `id`, `type`, `x`, `y`, `width`, `height`, `angle`, `strokeColor`, `backgroundColor`, `opacity`, `seed`, `version`, `versionNonce`, `index` (fractional ordering), `isDeleted`, `groupIds`, `frameId`, `boundElements`, `locked`.
+**Ключові властивості (з `_ExcalidrawElementBase`):** `id`, `type`, `x`, `y`, `width`, `height`, `angle`, `strokeColor`, `backgroundColor`, `opacity`, `seed`, `version`, `versionNonce`, `index` (дробове впорядкування), `isDeleted`, `groupIds`, `frameId`, `boundElements`, `locked`.
 
 **Підтипи:**
 
@@ -37,7 +39,7 @@
 
 **Ключові методи:** `replaceAllElements`, `insertElement`, `mutateElement`, `getNonDeletedElements`, `getSelectedElements`, `triggerUpdate`, `getSceneNonce`.
 
-**Механізм інвалідації:** `sceneNonce` — випадкове число, що змінюється при кожному оновленні сцени; використовується як cache key для мемоізованого рендерингу та React re-render через `onUpdate` → `triggerRender`.
+**Механізм інвалідації:** `sceneNonce` — випадкове число, що змінюється при кожному оновленні сцени; використовується як **ключ кешу** для мемоізованого рендерингу та React re-render через `onUpdate` → `triggerRender`.
 
 **Де використовується:** `packages/element/src/Scene.ts` (визначення), `packages/excalidraw/components/App.tsx` (`this.scene = new Scene()`), `packages/excalidraw/scene/Renderer.ts` (споживає `scene.getNonDeletedElements()`).
 
@@ -170,13 +172,13 @@
 
 ## Store
 
-**Визначення.** Клас, що відповідає за **tracking змін** для undo/redo та incremental updates. Працює з двома типами інкрементів: **`DurableIncrement`** (записуються в історію) та **`EphemeralIncrement`** (тимчасові, не для undo).
+**Визначення.** Клас, що відповідає за **облік змін** (undo/redo та інкрементальні оновлення). Працює з двома типами інкрементів: **`DurableIncrement`** (записуються в історію) та **`EphemeralIncrement`** (тимчасові, не для undo).
 
 **Механізм:** при виконанні Action, `captureUpdate` визначає, чи записувати зміну. `Store` порівнює snapshot до/після та генерує delta. `History` підписується на `onDurableIncrementEmitter` для undo/redo стеку.
 
 **Де використовується:** `packages/element/src/store.ts` (клас `Store`), `packages/excalidraw/components/App.tsx` (`this.store`), `packages/excalidraw/history.ts` (споживає `DurableIncrement`).
 
-**НЕ плутати з:** Redux store або іншими state management рішеннями. `Store` в Excalidraw — спеціалізований механізм відстеження інкрементальних змін, а не загальне сховище стану.
+**НЕ плутати з:** Redux store або іншими state management рішеннями. `Store` в Excalidraw — спеціалізований механізм **обліку інкрементальних змін**, а не загальне сховище стану.
 
 ---
 
@@ -186,7 +188,7 @@
 
 **Варіанти:**
 - `ExcalidrawFrameElement` — звичайний frame з опціональним `name`
-- `ExcalidrawMagicFrameElement` — magic frame; генерація контенту вимагає налаштованого клієнтського бекенду (`VITE_APP_AI_BACKEND` у `packages/excalidraw/vite-env.d.ts`), а не вбудованого сервера в репозиторії
+- `ExcalidrawMagicFrameElement` — magic frame; генерація контенту вимагає налаштованого клієнтського бекенду (`VITE_APP_AI_BACKEND` у `packages/excalidraw/vite-env.d.ts`), а не вбудованого сервера в репозиторії (узгоджено з розділом про Frames у [PRD.md](PRD.md)).
 
 **Де використовується:** `packages/element/src/types.ts` (типи), `packages/excalidraw/actions/actionFrame.ts` (actions), `packages/excalidraw/frame.ts` (утиліти), `packages/excalidraw/components/App.tsx` (`onMagicFrameGenerate`), `packages/excalidraw/renderer/` (clip rendering).
 

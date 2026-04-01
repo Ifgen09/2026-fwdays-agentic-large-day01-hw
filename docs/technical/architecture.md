@@ -197,25 +197,9 @@ flowchart TB
 
 ---
 
-## TypeScript, path aliases і збірка пакетів
+## Збірка, alias та шар excalidraw-app
 
-- **Кореневий `tsconfig.json`:** `include` — `packages`, `excalidraw-app`; `exclude` — `examples`, `dist`, `types`, `tests`.
-- **`compilerOptions.paths`:** `@excalidraw/common`, `@excalidraw/element`, `@excalidraw/math`, `@excalidraw/utils` → `packages/*/src`; `@excalidraw/excalidraw` → `packages/excalidraw/index.tsx` та підшляхи `packages/excalidraw/*`.
-- **Пакети** збирають артефакти в `dist/` через скрипти на **esbuild** (`scripts/buildPackage.js`, `scripts/buildBase.js`, `scripts/buildUtils.js` — викликаються з `package.json` підпакетів як `build:esm`).
-- **Vite** (`excalidraw-app/vite.config.mts`): для dev-сервера налаштовані **alias**, які дзеркалять ту саму схему, що й `tsconfig` (прямий резолв сирців); `envDir: "../"` — змінні з кореневих `.env*`; `server.port` — з `VITE_APP_PORT` або **3000** за замовчуванням.
-- Плагіни у `vite.config.mts` (імпорти на початку файлу): `@vitejs/plugin-react`, `vite-plugin-svgr`, `vite-plugin-ejs`, `vite-plugin-pwa`, `vite-plugin-checker`, `vite-plugin-html`, `vite-plugin-sitemap`, `woff2BrowserPlugin` з `../scripts/woff2/woff2-vite-plugins`.
-- **Тести:** кореневий `vitest.config.mts` використовує ті самі alias `@excalidraw/*`, що й TypeScript / Vite (див. також [systemPatterns.md](../memory/systemPatterns.md)).
-
----
-
-## excalidraw-app: продуктовий шар над бібліотекою
-
-- Застосунок імпортує модулі з `@excalidraw/excalidraw` (резолв через alias у `excalidraw-app/vite.config.mts`).
-- **Jotai** використовується і в ядрі (`EditorJotaiProvider` у `packages/excalidraw/index.tsx`), і в застосунку — файл `excalidraw-app/app-jotai.ts` (атоми/стор для оболонки).
-- Колаборація та мережеві клієнти: каталог `excalidraw-app/collab/` (наприклад `Collab.tsx` з динамічним імпортом клієнта); **Firebase** — `excalidraw-app/data/firebase.ts`.
-- **Sentry:** side-effect імпорт `../excalidraw-app/sentry` у `excalidraw-app/index.tsx` (рядок 5).
-- Імперативний API редактора ззовні дерева: `ExcalidrawAPIProvider`, `onExcalidrawAPI`, контексти `ExcalidrawAPIContext` / `ExcalidrawAPISetContext` у `packages/excalidraw/index.tsx` (коментар у коді про використання зовні `<Excalidraw>`).
-- Глобальні стилі редактора підключаються в `packages/excalidraw/index.tsx`: `app.scss`, `styles.scss`, `fonts.css`.
+Схема **path aliases** (`tsconfig`), **Vite** (dev, плагіни), **esbuild** для пакетів, **Vitest** з тими самими alias, **Jotai**, підключення **Sentry** і стилів — описані в [systemPatterns.md](../memory/systemPatterns.md); команди та версії — у [techContext.md](../memory/techContext.md). Тут лише архітектурна роль: **excalidraw-app** імпортує `@excalidraw/excalidraw` (резолв сирців через alias), додає колаборацію (`excalidraw-app/collab/`), клієнти Firebase (`excalidraw-app/data/firebase.ts`) і точку входу з `excalidraw-app/index.tsx` — на відміну від пакета бібліотеки, який не нав’язує хостинг і мережевий стек.
 
 ---
 
